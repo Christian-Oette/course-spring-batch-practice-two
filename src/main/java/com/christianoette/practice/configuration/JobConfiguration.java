@@ -12,6 +12,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.context.ApplicationContext;
@@ -37,13 +40,25 @@ public class JobConfiguration {
     }
 
     @Bean
-    public Job job() {
+    public Job job() throws Exception {
         return jobBuilderFactory.get("airlineSearchJob")
-                //.start(requestFlyUsStep())
-                .start(requestAdiosStep())
-                .next(requestBelarusStep())
-                // TODO Fix request duration before adding more airlines!
+                .start(searchFlow())
+                .end()
                 .listener(new CourseUtilJobSummaryListener())
+                .build();
+    }
+
+    @Bean
+    public Flow searchFlow() throws Exception {
+        ProviderDecider decider = new ProviderDecider();
+        return new FlowBuilder<SimpleFlow>("searchFlow")
+                .start(decider)
+                .on("DUBAI_AMSTERDAM_OFFER_ONLY")
+                .to(dubaiAmsterdamOffer())
+                .from(decider)
+                .on("DEFAULT_SEARCH")
+                .to(requestAdiosStep())
+                .next(requestBelarusStep())
                 .build();
     }
 
