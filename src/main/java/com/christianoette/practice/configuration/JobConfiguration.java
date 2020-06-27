@@ -21,6 +21,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Configuration
@@ -58,14 +60,41 @@ public class JobConfiguration {
                 .to(dubaiAmsterdamOffer())
                 .from(decider)
                 .on("DEFAULT_SEARCH")
-                .to(requestAdiosStep())
-                .next(requestFlyUsStep())
+                .to(searchAirlineFlow())
                 .from(decider)
                 .on("NEW_YORK_AMSTERDAM_OFFER_INCLUDED")
                 .to(newYorkAmsterdamOffer())
-                .next(requestAdiosStep())
-                .next(requestFlyUsStep())
+                .next(searchAirlineFlow())
                 .build();
+    }
+
+    private Flow searchAirlineFlow() throws Exception {
+        Flow flow1 = airlineFlow("adios", requestAdiosStep());
+        Flow flow2 = airlineFlow("flyUs", requestFlyUsStep());
+        Flow flow3 = airlineFlow("sp", requestSouthPacificStep());
+        Flow flow4 = airlineFlow("ta", requestTransamericanStep());
+        Flow flow5 = airlineFlow("be", requestBelarusStep());
+        Flow flow6 = airlineFlow("oc", requestOceanicStep());
+
+        return new FlowBuilder<SimpleFlow>("parallelSearchFlow")
+                .split(taskExecutor())
+                .add(flow1, flow2, flow3, flow4, flow5, flow6)
+                .build();
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+        taskExecutor.setConcurrencyLimit(10);
+        return taskExecutor;
+    }
+
+    private Flow airlineFlow(String flowName, Step step) throws Exception {
+        SimpleFlow flow = new FlowBuilder<SimpleFlow>(flowName)
+                .start(step)
+                .build();
+        flow.afterPropertiesSet();
+        return flow;
     }
 
 
