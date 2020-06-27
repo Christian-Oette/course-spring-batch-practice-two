@@ -1,16 +1,15 @@
 package com.christianoette.practice.configuration.airline;
 
 
+import com.christianoette.dontchangeit.AirlineConfiguration;
 import com.christianoette.dontchangeit.model.Airport;
 import com.christianoette.dontchangeit.simulator.SimulatorResponseDto;
 import com.christianoette.dontchangeit.utils.CourseUtils;
 import com.christianoette.dontchangeit.AirlineSearchService;
 import com.christianoette.practice.configuration.JobConfiguration;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -56,17 +55,18 @@ class AirlineJobFlowTest {
     public Tasklet saveNewYorkAmsterdamOffer;
 
     @Test
-    void thatMultipleAirlinesAreReturned() throws Exception {
+    void thatMultipleAirlinesAreRequested() throws Exception {
         // given
-        Airport departureAirport = Airport.DUBAI;
-        Airport arrivalAirport = Airport.AMSTERDAM;
+        Airport departureAirport = Airport.PARIS;
+        Airport arrivalAirport = Airport.LONDON;
         JobParameters jobParameters = createJobParameters(departureAirport, arrivalAirport);
 
         // when
-        jobLauncherTestUtils.launchJob(jobParameters);
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
         // then
-        // TODO assertions here!
+        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+        // TODO additional assertions here!
     }
 
     @Test

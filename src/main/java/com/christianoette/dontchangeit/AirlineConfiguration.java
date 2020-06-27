@@ -1,11 +1,11 @@
-package com.christianoette.practice.configuration.airline;
+package com.christianoette.dontchangeit;
 
 import com.christianoette.dontchangeit.model.FlightSearchResultRepository;
 import com.christianoette.dontchangeit.simulator.AirlineItemReader;
 import com.christianoette.dontchangeit.simulator.AirlineResponseSimulator;
 import com.christianoette.dontchangeit.simulator.SimulatorResponseDto;
 import com.christianoette.dontchangeit.utils.CourseUtils;
-import com.christianoette.dontchangeit.AirlineSearchService;
+import com.christianoette.practice.configuration.airline.Airline;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
