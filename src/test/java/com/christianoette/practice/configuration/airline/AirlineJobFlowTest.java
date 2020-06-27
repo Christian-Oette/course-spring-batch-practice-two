@@ -31,33 +31,33 @@ class AirlineJobFlowTest {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    @MockBean(name = "transAmericanReader")
+    @MockBean(name = Airline.TRANS_AMERICAN_READER)
     private ItemReader<SimulatorResponseDto> transAmericanReader;
 
-    @MockBean(name = "adiosAirlineItemReader")
+    @MockBean(name = Airline.ADIOS_READER)
     private ItemReader<SimulatorResponseDto> adiosAirlineItemReader;
 
-    @MockBean(name = "oceanicAirlineItemReader")
+    @MockBean(name = Airline.OCEANIC_AIRLINE_READER)
     private ItemReader<SimulatorResponseDto> oceanicAirlineItemReader;
 
-    @MockBean(name = "belarusAirlineItemReader")
+    @MockBean(name = Airline.BELARUS_AIRLINE_READER)
     private ItemReader<SimulatorResponseDto> belarusAirlineItemReader;
 
-    @MockBean(name = "flyUsAirlineItemReader")
+    @MockBean(name = Airline.FLY_US_READER)
     private ItemReader<SimulatorResponseDto> flyUsAirlineItemReader;
 
-    @MockBean(name = "southPacificAirlineItemReader")
+    @MockBean(name = Airline.SOUTH_PACIFIC_READER)
     private ItemReader<SimulatorResponseDto> southPacificAirlineItemReader;
 
-    @MockBean(name = "saveDubaiAmsterdamOffer")
+    @MockBean(name = AirlineConfiguration.DUBAI_AMSTERDAM_OFFER_TASKLET)
     public Tasklet saveDubaiAmsterdamOffer;
 
-    @MockBean(name = "saveNewYorkAmsterdamOffer")
+    @MockBean(name = AirlineConfiguration.NEW_YORK_AMSTERDAM_OFFER_TASKLET)
     public Tasklet saveNewYorkAmsterdamOffer;
 
 
     @Test
-    void test() throws Exception {
+    void testRequestToAllAirlines() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter(AirlineSearchService.JOB_KEY_SEARCH_ID, new JobParameter("-"))
                 .addParameter(AirlineSearchService.JOB_KEY_DEPARTURE_DATE, new JobParameter(CourseUtils.toDate(LocalDate.now())))
