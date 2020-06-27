@@ -55,21 +55,33 @@ class AirlineJobFlowTest {
     @MockBean(name = AirlineConfiguration.NEW_YORK_AMSTERDAM_OFFER_TASKLET)
     public Tasklet saveNewYorkAmsterdamOffer;
 
+    @Test
+    void thatMultipleAirlinesAreReturned() throws Exception {
+        // given
+        Airport departureAirport = Airport.DUBAI;
+        Airport arrivalAirport = Airport.AMSTERDAM;
+        JobParameters jobParameters = createJobParameters(departureAirport, arrivalAirport);
+
+        // when
+        jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        // TODO assertions here!
+    }
 
     @Test
-    void testRequestToAllAirlines() throws Exception {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter(AirlineSearchService.JOB_KEY_SEARCH_ID, new JobParameter("-"))
-                .addParameter(AirlineSearchService.JOB_KEY_DEPARTURE_DATE, new JobParameter(CourseUtils.toDate(LocalDate.now())))
-                .addParameter(AirlineSearchService.JOB_KEY_DEPARTURE_AIRPORT, new JobParameter(Airport.DUBAI.name()))
-                .addParameter(AirlineSearchService.JOB_KEY_ARRIVAL_AIRPORT, new JobParameter(Airport.AMSTERDAM.name()))
-                .toJobParameters();
+    void thatDubaiAmsterdamSpecialOfferIsUsed() throws Exception {
+        // TODO add test logic here
+    }
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+    @Test
+    void thatNewYorkAmsterdamSpecialOfferIsUsed() throws Exception {
+        // TODO add test logic here
+    }
 
-        Mockito.verify(transAmericanReader, Mockito.never()).read();
-        Mockito.verify(saveDubaiAmsterdamOffer).execute(Mockito.any(StepContribution.class), Mockito.any(ChunkContext.class));
+    @Test
+    void thatTimeoutIsSkipped() throws Exception {
+        // TODO add test logic here
     }
 
     @Configuration
@@ -84,5 +96,15 @@ class AirlineJobFlowTest {
             jobLauncherTestUtils.setJob(airlineSearchJob);
             return jobLauncherTestUtils;
         }
+
+    }
+
+    private JobParameters createJobParameters(Airport departureAirport, Airport arrivalAirport) {
+        return new JobParametersBuilder()
+                .addParameter(AirlineSearchService.JOB_KEY_SEARCH_ID, new JobParameter("-"))
+                .addParameter(AirlineSearchService.JOB_KEY_DEPARTURE_DATE, new JobParameter(CourseUtils.toDate(LocalDate.now())))
+                .addParameter(AirlineSearchService.JOB_KEY_DEPARTURE_AIRPORT, new JobParameter(departureAirport.name()))
+                .addParameter(AirlineSearchService.JOB_KEY_ARRIVAL_AIRPORT, new JobParameter(arrivalAirport.name()))
+                .toJobParameters();
     }
 }
