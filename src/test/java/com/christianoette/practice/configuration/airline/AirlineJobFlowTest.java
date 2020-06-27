@@ -8,8 +8,10 @@ import com.christianoette.dontchangeit.utils.CourseUtils;
 import com.christianoette.dontchangeit.AirlineSearchService;
 import com.christianoette.practice.configuration.JobConfiguration;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -66,12 +68,27 @@ class AirlineJobFlowTest {
 
         // then
         assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
-        // TODO additional assertions here!
+        Mockito.verify(adiosAirlineItemReader).read();
+        Mockito.verify(belarusAirlineItemReader).read();
     }
 
     @Test
     void thatDubaiAmsterdamSpecialOfferIsUsed() throws Exception {
-        // TODO add test logic here
+        // given
+        Airport departureAirport = Airport.DUBAI;
+        Airport arrivalAirport = Airport.AMSTERDAM;
+        JobParameters jobParameters = createJobParameters(departureAirport, arrivalAirport);
+
+        // when
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+        Mockito.verify(saveDubaiAmsterdamOffer).execute(
+                Mockito.any(StepContribution.class),
+                Mockito.any(ChunkContext.class));
+        Mockito.verify(adiosAirlineItemReader, Mockito.never()).read();
+        Mockito.verify(belarusAirlineItemReader, Mockito.never()).read();
     }
 
     @Test
