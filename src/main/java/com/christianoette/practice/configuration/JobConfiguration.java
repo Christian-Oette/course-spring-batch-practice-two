@@ -3,6 +3,7 @@ package com.christianoette.practice.configuration;
 import com.christianoette.dontchangeit.AirlineConfiguration;
 import com.christianoette.dontchangeit.simulator.AirlineSearchResultWriter;
 import com.christianoette.dontchangeit.simulator.SimulatorResponseDto;
+import com.christianoette.dontchangeit.simulator.airlines.AirlineRequestTimeoutException;
 import com.christianoette.dontchangeit.utils.CourseUtilJobSummaryListener;
 import com.christianoette.practice.configuration.airline.Airline;
 import org.apache.logging.log4j.LogManager;
@@ -58,12 +59,12 @@ public class JobConfiguration {
                 .from(decider)
                 .on("DEFAULT_SEARCH")
                 .to(requestAdiosStep())
-                .next(requestBelarusStep())
+                .next(requestFlyUsStep())
                 .from(decider)
                 .on("NEW_YORK_AMSTERDAM_OFFER_INCLUDED")
                 .to(newYorkAmsterdamOffer())
                 .next(requestAdiosStep())
-                .next(requestBelarusStep())
+                .next(requestFlyUsStep())
                 .build();
     }
 
@@ -104,6 +105,9 @@ public class JobConfiguration {
         ItemReader<SimulatorResponseDto> reader = applicationContext.getBean(beanName, ItemReader.class);
         return stepBuilderFactory.get("request_" + airline)
                 .<SimulatorResponseDto, SimulatorResponseDto>chunk(1)
+                .faultTolerant()
+                .skip(AirlineRequestTimeoutException.class)
+                .skipLimit(1)
                 .reader(reader)
                 .writer(airlineSearchResultWriter())
                 .build();

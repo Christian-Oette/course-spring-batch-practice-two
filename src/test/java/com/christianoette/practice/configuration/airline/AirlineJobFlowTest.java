@@ -4,6 +4,7 @@ package com.christianoette.practice.configuration.airline;
 import com.christianoette.dontchangeit.AirlineConfiguration;
 import com.christianoette.dontchangeit.model.Airport;
 import com.christianoette.dontchangeit.simulator.SimulatorResponseDto;
+import com.christianoette.dontchangeit.simulator.airlines.AirlineRequestTimeoutException;
 import com.christianoette.dontchangeit.utils.CourseUtils;
 import com.christianoette.dontchangeit.AirlineSearchService;
 import com.christianoette.practice.configuration.JobConfiguration;
@@ -112,7 +113,19 @@ class AirlineJobFlowTest {
 
     @Test
     void thatTimeoutIsSkipped() throws Exception {
-        // TODO add test logic here
+        // given
+        Airport departureAirport = Airport.LONDON;
+        Airport arrivalAirport = Airport.PARIS;
+        JobParameters jobParameters = createJobParameters(departureAirport, arrivalAirport);
+        Mockito.when(flyUsAirlineItemReader.read())
+                .thenThrow(new AirlineRequestTimeoutException())
+                .thenReturn(null);
+
+        // when
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     }
 
     @Configuration
