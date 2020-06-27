@@ -39,8 +39,8 @@ public class JobConfiguration {
     @Bean
     public Job job() {
         return jobBuilderFactory.get("airlineSearchJob")
-                //.start(requestFlyUsStep()) TODO fix timeouts
-                .start(requestAdiosStep())
+                .start(requestFlyUsStep())
+                //.start(requestAdiosStep())
                 .next(requestBelarusStep())
                 // TODO Fix request duration before adding more airlines!
                 .listener(new CourseUtilJobSummaryListener())
