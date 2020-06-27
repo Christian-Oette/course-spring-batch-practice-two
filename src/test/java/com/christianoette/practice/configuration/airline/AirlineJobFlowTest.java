@@ -93,7 +93,21 @@ class AirlineJobFlowTest {
 
     @Test
     void thatNewYorkAmsterdamSpecialOfferIsUsed() throws Exception {
-        // TODO add test logic here
+        // given
+        Airport departureAirport = Airport.NEWYORK;
+        Airport arrivalAirport = Airport.AMSTERDAM;
+        JobParameters jobParameters = createJobParameters(departureAirport, arrivalAirport);
+
+        // when
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+        Mockito.verify(saveNewYorkAmsterdamOffer).execute(
+                Mockito.any(StepContribution.class),
+                Mockito.any(ChunkContext.class));
+        Mockito.verify(adiosAirlineItemReader).read();
+        Mockito.verify(belarusAirlineItemReader).read();
     }
 
     @Test

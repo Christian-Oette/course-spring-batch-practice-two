@@ -24,6 +24,8 @@ public class ProviderDecider implements JobExecutionDecider {
         Set<Airport> flightAirports = Set.of(departure, arrival);
         if (flightAirports.contains(Airport.DUBAI) && flightAirports.contains(Airport.AMSTERDAM)) {
             return new FlowExecutionStatus("DUBAI_AMSTERDAM_OFFER_ONLY");
+        } else if (flightAirports.contains(Airport.NEWYORK) && flightAirports.contains(Airport.AMSTERDAM)) {
+            return new FlowExecutionStatus("NEW_YORK_AMSTERDAM_OFFER_INCLUDED");
         } else {
             return new FlowExecutionStatus("DEFAULT_SEARCH");
         }

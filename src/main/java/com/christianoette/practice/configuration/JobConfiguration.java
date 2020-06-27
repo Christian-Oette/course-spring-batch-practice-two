@@ -59,6 +59,11 @@ public class JobConfiguration {
                 .on("DEFAULT_SEARCH")
                 .to(requestAdiosStep())
                 .next(requestBelarusStep())
+                .from(decider)
+                .on("NEW_YORK_AMSTERDAM_OFFER_INCLUDED")
+                .to(newYorkAmsterdamOffer())
+                .next(requestAdiosStep())
+                .next(requestBelarusStep())
                 .build();
     }
 
